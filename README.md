@@ -37,3 +37,46 @@ ruby q.rb --repo /path/to/repo --detailed-structure
 ruby q.rb --repo /path/to/repo --json
 ruby q.rb --repo /path/to/repo --top 30 --since 3.months.ago --show-structure-overview
 ```
+
+## Example Output
+
+```bash
+$ ruby q.rb --min-loc 700 --detailed-structure --since 2.months.ago --repo ../hello-world
+Ruby Quality Signals
+Files scanned: 3
+
+Column descriptions:
+  Churn    = total git commits touching the file (optionally since --since).
+  Branches = count of control-flow tokens (sum of per-keyword counts).
+  LOC      = non-empty lines of code in the file.
+  File     = repository-relative path.
+
+Churn  Branches LOC    File
+13     253      805    app/models/document.rb
+7      66       1193   app/services/pdf_generator.rb
+1      146      744    app/services/company_generator.rb
+
+Detailed structure (all scanned files):
+module_inclusion
+  include                    count=9    avg_loc_per_item=12.11
+association
+  has_many                   count=7    avg_loc_per_item=2.14
+  has_one                    count=2    avg_loc_per_item=2.00
+  belongs_to                 count=7    avg_loc_per_item=1.00
+public_attribute_macros
+  public attr_reader         count=1    avg_loc_per_item=1.00
+macros
+  scope                      count=10   avg_loc_per_item=20.60
+  validates                  count=1    avg_loc_per_item=4.00
+  validate                   count=1    avg_loc_per_item=1.00
+  after_*                    count=1    avg_loc_per_item=1.00
+  enum                       count=2    avg_loc_per_item=4.00
+public_class_methods
+  public class def           count=2    avg_loc_per_item=1.00
+initializer
+  initialize                 count=2    avg_loc_per_item=1.00
+public_methods
+  public def                 count=68   avg_loc_per_item=1.12
+private_methods
+  private def                count=69   avg_loc_per_item=1.00
+```
