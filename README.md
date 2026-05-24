@@ -35,7 +35,7 @@ linecounter [options]
 - `--top N` Show top N rows (default: 20).
 - `--since STR` Limit churn to commits since date. Supports git-parseable dates in `YYYY-MM-DD` (e.g., `2025-01-01`), other git-parseable strings (e.g., `last friday`), and relative forms: `N.days.ago`, `N.weeks.ago`, `N.hours.ago`, `N.months.ago`, `N.years.ago`, plus `today`/`yesterday`.
 - `--min-loc N` Exclude files below N non-empty lines (default: 20).
-- `--repo PATH` Path to a git repo to scan (required).
+- `--repo PATH` Path to a git repo to scan (default: current directory).
 - `--json` Output JSON instead of text.
 - `--show-branch-count` Show per-branch keyword breakdown under each file.
 - `--show-structure-overview` Show a summary of class structure counts across all files, including `avg_loc_per_item` (avg statement lines per item).
@@ -45,9 +45,12 @@ linecounter [options]
 
 ## Examples
 
-`--repo` is required. If omitted, the script prints only the `--repo` requirement line and exits.
+`--repo` defaults to the current directory, so running `linecounter` with no
+arguments scans the repo you're in. If the directory isn't a git repository it
+exits with an error.
 
 ```bash
+linecounter
 linecounter --repo /path/to/repo
 linecounter --repo /path/to/repo --top 50
 linecounter --repo /path/to/repo --since 2025-01-01

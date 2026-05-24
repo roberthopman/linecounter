@@ -22,11 +22,7 @@ module Linecounter
       options = DEFAULTS.dup
       build_parser(options).parse!(argv)
 
-      if options[:repo].nil?
-        puts "--repo PATH is required. Path to a git repo to scan."
-        exit 1
-      end
-
+      options[:repo] ||= "."
       options[:since] = Git.parse_since(options[:since])
 
       repo_path = File.expand_path(options[:repo])
@@ -44,7 +40,7 @@ module Linecounter
         o.on("--top N", Integer, "Show top N rows (default: 20).") { |v| options[:top] = v }
         o.on("--since STR", String, "Limit churn to commits since date. Supports git-parseable dates in YYYY-MM-DD (e.g., '2025-01-01'), other git-parseable strings (e.g., 'last friday'), and relative forms: 'N.days.ago', 'N.weeks.ago', 'N.hours.ago', 'N.months.ago', 'N.years.ago', plus 'today'/'yesterday'.") { |v| options[:since] = v }
         o.on("--min-loc N", Integer, "Exclude files below N non-empty lines (default: 20).") { |v| options[:min_loc] = v }
-        o.on("--repo PATH", String, "Path to a git repo to scan (required).") { |v| options[:repo] = v }
+        o.on("--repo PATH", String, "Path to a git repo to scan (default: current directory).") { |v| options[:repo] = v }
         o.on("--json", "Output JSON instead of text.") { options[:json] = true }
         o.on("--show-branch-count", "Show per-branch keyword breakdown under each file.") { options[:show_branch_count] = true }
         o.on("--show-structure-overview", "Show a summary of class structure counts across all files, including avg_loc_per_item (avg statement lines per item).") { options[:show_structure_overview] = true }
@@ -53,6 +49,7 @@ module Linecounter
         o.on("-h", "--help", "Show this help.") { puts o; exit }
         o.separator ""
         o.separator "Examples:"
+        o.separator "  linecounter"
         o.separator "  linecounter --repo /path/to/repo"
         o.separator "  linecounter --repo /path/to/repo --top 50"
         o.separator "  linecounter --repo /path/to/repo --since 2025-01-01"

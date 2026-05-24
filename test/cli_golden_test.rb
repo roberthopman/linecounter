@@ -28,10 +28,18 @@ class CLIGoldenTest < Minitest::Test
     define_method(:"test_#{name}") { assert_golden(name, extra) }
   end
 
-  def test_requires_repo
-    out, _err, status = Open3.capture3(RUBY, Q_RB)
-    assert_includes out, "--repo PATH is required"
-    refute status.success?, "expected non-zero exit when --repo is omitted"
+  def test_defaults_repo_to_current_directory
+    out, _err, status = Open3.capture3(RUBY, Q_RB, chdir: @repo)
+    assert status.success?, "expected success when --repo omitted inside a git repo"
+    assert_equal File.read(File.join(GOLDEN_DIR, "default.txt")), normalize(out)
+  end
+
+  def test_aborts_when_current_directory_is_not_a_git_repo
+    Dir.mktmpdir("linecounter-not-a-repo") do |dir|
+      _out, err, status = Open3.capture3(RUBY, Q_RB, chdir: dir)
+      refute status.success?
+      assert_includes err, "Not inside a git repository"
+    end
   end
 
   private
