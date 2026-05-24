@@ -84,22 +84,22 @@ fix), and reviewed as such.
 ## Known issues to fix (as deliberate diffs in step 4)
 
 ```
-Issue                                Where            Status
------                                -----            ------
-structure_overview avg = 0.00        q.rb:348         pinned, to fix
+Issue                                Where                        Status
+-----                                -----                        ------
+structure_overview avg = 0.00        report.rb (text)             pinned, to fix
   (LOC summed by item key, divided
    by type key -> always misses)
-JSON loc overview mis-keyed too      q.rb:310-311     pinned, to fix
-def self. / def initialize also       q.rb:171-175     pinned, to review
-  counted as plain public def
-avg_loc_per_item = 1.00 everywhere   statement_span   to investigate
-  (may collapse multi-line bodies)   (q.rb:178)
+JSON loc overview mis-keyed too      report.rb (json)             pinned, to fix
+def self. / def initialize also      structure_analyzer.rb        pinned, to review
+  counted as plain public def          (STRUCTURE_ITEMS)
+avg_loc_per_item = 1.00 everywhere   structure_analyzer.rb        to investigate
+  (may collapse multi-line bodies)     (statement_span)
 ```
 
 ## Status
 
   - [x] Step 1 — safety net (8 golden snapshots, green)
-  - [ ] Step 2 — extract into require-able lib/
+  - [x] Step 2 — extract into require-able lib/ (q.rb is now a shim; golden green)
   - [ ] Step 3 — unit tests
   - [ ] Step 4 — fix bugs
   - [ ] Step 5 — package as gem

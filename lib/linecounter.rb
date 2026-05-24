@@ -1,0 +1,7 @@
+require_relative "linecounter/branch_analyzer"
+require_relative "linecounter/structure_analyzer"
+require_relative "linecounter/git"
+require_relative "linecounter/scanner"
+require_relative "linecounter/analyzer"
+require_relative "linecounter/report"
+require_relative "linecounter/cli"
