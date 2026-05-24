@@ -1,0 +1,14 @@
+Ruby Quality Signals
+Files scanned: 2
+
+Column descriptions:
+  Churn    = total git commits touching the file (optionally since --since).
+  Branches = count of control-flow tokens (sum of per-keyword counts).
+  LOC      = non-empty lines of code in the file.
+  File     = repository-relative path.
+
+Churn  Branches LOC    File
+3      7        42     app/models/widget.rb
+  if condition=1 | elsif branch=1 | unless condition=1 | case expression=0 | when branch=0 | while loop=0 | until loop=0 | rescue handler=0 | ensure block=0 | begin block=0 | logical AND (&&)=0 | logical OR (||)=1 | ternary operator (?)=2 | return statement=1
+2      12       29     app/services/calc.rb
+  if condition=3 | elsif branch=0 | unless condition=1 | case expression=1 | when branch=2 | while loop=0 | until loop=0 | rescue handler=1 | ensure block=0 | begin block=0 | logical AND (&&)=0 | logical OR (||)=0 | ternary operator (?)=3 | return statement=1

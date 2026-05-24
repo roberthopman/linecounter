@@ -1,0 +1,12 @@
+Ruby Quality Signals
+Files scanned: 2
+
+Column descriptions:
+  Churn    = total git commits touching the file (optionally since --since).
+  Branches = count of control-flow tokens (sum of per-keyword counts).
+  LOC      = non-empty lines of code in the file.
+  File     = repository-relative path.
+
+Churn  Branches LOC    File
+3      7        42     app/models/widget.rb
+2      12       29     app/services/calc.rb

@@ -1,0 +1,127 @@
+{
+  "generated_at": "<TS>",
+  "files_scanned": 2,
+  "top": [
+    {
+      "file": "app/models/widget.rb",
+      "loc": 42,
+      "branches": 7,
+      "structures": {
+        "module_inclusion": 2,
+        "constants": 1,
+        "association": 3,
+        "macros": 5,
+        "public_attribute_macros": 1,
+        "public_class_methods": 1,
+        "public_methods": 4,
+        "initializer": 1,
+        "private_methods": 2
+      },
+      "structure_item_counts": {
+        "include": 1,
+        "extend": 1,
+        "constant_assignment": 1,
+        "belongs_to": 1,
+        "has_many": 1,
+        "has_one": 1,
+        "validates": 1,
+        "validate": 1,
+        "scope": 1,
+        "before_callback": 1,
+        "enum": 1,
+        "public_attr_reader": 1,
+        "public_class_method_def": 1,
+        "public_instance_method_def": 4,
+        "initializer_def": 1,
+        "private_instance_method_def": 2
+      },
+      "structure_item_loc": {
+        "include": 1,
+        "extend": 1,
+        "constant_assignment": 1,
+        "belongs_to": 1,
+        "has_many": 1,
+        "has_one": 1,
+        "validates": 1,
+        "validate": 1,
+        "scope": 1,
+        "before_callback": 1,
+        "enum": 1,
+        "public_attr_reader": 1,
+        "public_class_method_def": 1,
+        "public_instance_method_def": 4,
+        "initializer_def": 1,
+        "private_instance_method_def": 2
+      },
+      "churn": 3
+    },
+    {
+      "file": "app/services/calc.rb",
+      "loc": 29,
+      "branches": 12,
+      "structures": {
+        "public_methods": 3,
+        "initializer": 1,
+        "private_methods": 1
+      },
+      "structure_item_counts": {
+        "public_instance_method_def": 3,
+        "initializer_def": 1,
+        "private_instance_method_def": 1
+      },
+      "structure_item_loc": {
+        "public_instance_method_def": 3,
+        "initializer_def": 1,
+        "private_instance_method_def": 1
+      },
+      "churn": 2
+    }
+  ],
+  "structure_overview": {
+    "module_inclusion": 2,
+    "constants": 1,
+    "association": 3,
+    "macros": 5,
+    "public_attribute_macros": 1,
+    "public_class_methods": 1,
+    "public_methods": 7,
+    "initializer": 2,
+    "private_methods": 3
+  },
+  "structure_item_loc_overview": {
+    "include": 1,
+    "extend": 1,
+    "constant_assignment": 1,
+    "belongs_to": 1,
+    "has_many": 1,
+    "has_one": 1,
+    "validates": 1,
+    "validate": 1,
+    "scope": 1,
+    "before_callback": 1,
+    "enum": 1,
+    "public_attr_reader": 1,
+    "public_class_method_def": 1,
+    "public_instance_method_def": 7,
+    "initializer_def": 2,
+    "private_instance_method_def": 3
+  },
+  "structure_item_counts_overview": {
+    "include": 1,
+    "extend": 1,
+    "constant_assignment": 1,
+    "belongs_to": 1,
+    "has_many": 1,
+    "has_one": 1,
+    "validates": 1,
+    "validate": 1,
+    "scope": 1,
+    "before_callback": 1,
+    "enum": 1,
+    "public_attr_reader": 1,
+    "public_class_method_def": 1,
+    "public_instance_method_def": 7,
+    "initializer_def": 2,
+    "private_instance_method_def": 3
+  }
+}

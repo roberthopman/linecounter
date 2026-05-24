@@ -1,0 +1,39 @@
+Ruby Quality Signals
+Files scanned: 2
+
+Column descriptions:
+  Churn    = total git commits touching the file (optionally since --since).
+  Branches = count of control-flow tokens (sum of per-keyword counts).
+  LOC      = non-empty lines of code in the file.
+  File     = repository-relative path.
+
+Churn  Branches LOC    File
+3      7        42     app/models/widget.rb
+2      12       29     app/services/calc.rb
+
+Detailed structure (all scanned files):
+module_inclusion
+  include                    count=1    avg_loc_per_item=1.00
+  extend                     count=1    avg_loc_per_item=1.00
+constants
+  CONSTANT =                 count=1    avg_loc_per_item=1.00
+association
+  has_many                   count=1    avg_loc_per_item=1.00
+  has_one                    count=1    avg_loc_per_item=1.00
+  belongs_to                 count=1    avg_loc_per_item=1.00
+public_attribute_macros
+  public attr_reader         count=1    avg_loc_per_item=1.00
+macros
+  scope                      count=1    avg_loc_per_item=1.00
+  validates                  count=1    avg_loc_per_item=1.00
+  validate                   count=1    avg_loc_per_item=1.00
+  before_*                   count=1    avg_loc_per_item=1.00
+  enum                       count=1    avg_loc_per_item=1.00
+public_class_methods
+  public class def           count=1    avg_loc_per_item=1.00
+initializer
+  initialize                 count=2    avg_loc_per_item=1.00
+public_methods
+  public def                 count=7    avg_loc_per_item=1.00
+private_methods
+  private def                count=3    avg_loc_per_item=1.00
