@@ -20,6 +20,7 @@ module Linecounter
     CONSTANT_RE = /^\s*[A-Z][A-Z0-9_]*\s*=/
     DEF_SELF_RE = /^\s*def\s+self\./
     DEF_RE = /^\s*def\s+([a-zA-Z_]\w*)\b/
+    INITIALIZE_RE = /^\s*def\s+initialize\b/
     CLASS_SELF_RE = /^\s*class\s+<<\s*self\b/
     VISIBILITY_RE = /^\s*(public|protected|private)\b/
     END_RE = /^\s*end\b/
@@ -63,13 +64,20 @@ module Linecounter
       { key: :private_delegate, type: :private_delegate, label: "private delegate", match: ->(s, v) { v == :private && s.match?(/\bdelegate\b/) } },
 
       { key: :public_class_method_def, type: :public_class_methods, label: "public class def", match: ->(s, v) { v == :public && s.match?(DEF_SELF_RE) } },
-      { key: :public_instance_method_def, type: :public_methods, label: "public def", match: ->(s, v) { v == :public && s.match?(DEF_RE) } },
-      { key: :protected_instance_method_def, type: :protected_methods, label: "protected def", match: ->(s, v) { v == :protected && s.match?(DEF_RE) } },
-      { key: :private_instance_method_def, type: :private_methods, label: "private def", match: ->(s, v) { v == :private && s.match?(DEF_RE) } },
-      { key: :initializer_def, type: :initializer, label: "initialize", match: ->(s, _v) { s.match?(/^\s*def\s+initialize\b/) } }
+      { key: :public_instance_method_def, type: :public_methods, label: "public def", match: ->(s, v) { v == :public && instance_def?(s) } },
+      { key: :protected_instance_method_def, type: :protected_methods, label: "protected def", match: ->(s, v) { v == :protected && instance_def?(s) } },
+      { key: :private_instance_method_def, type: :private_methods, label: "private def", match: ->(s, v) { v == :private && instance_def?(s) } },
+      { key: :initializer_def, type: :initializer, label: "initialize", match: ->(s, _v) { s.match?(INITIALIZE_RE) } }
     ].freeze
 
     module_function
+
+    # A plain instance-method definition: `def name`, but not `def self.x`
+    # (class method) and not `def initialize` (initializer). Keeping these
+    # mutually exclusive prevents a single def from being counted twice.
+    def instance_def?(str)
+      str.match?(DEF_RE) && !str.match?(DEF_SELF_RE) && !str.match?(INITIALIZE_RE)
+    end
 
     def statement_span(lines, start_idx)
       paren_balance = 0

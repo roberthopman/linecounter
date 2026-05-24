@@ -34,6 +34,6 @@ public_class_methods
 initializer
   initialize                 count=2    avg_loc_per_item=1.00
 public_methods
-  public def                 count=7    avg_loc_per_item=1.00
+  public def                 count=4    avg_loc_per_item=1.00
 private_methods
   private def                count=3    avg_loc_per_item=1.00

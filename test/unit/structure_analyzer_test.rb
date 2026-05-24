@@ -33,13 +33,13 @@ class StructureAnalyzerTest < Minitest::Test
     assert_equal 1, item_loc[:include]
   end
 
-  # PINNED KNOWN BUG (fix in step 4): "def self." and "def initialize" also
-  # match the plain public-def item (DEF_RE), so each is double-counted as a
-  # public instance method. Counting self.create + initialize + name = 3.
-  def test_counts_pins_def_self_and_initialize_double_count
+  # def self.x is only a class method; def initialize is only the initializer.
+  # Neither is also counted as a plain public def (regression test for the
+  # step-4 double-count fix). Only `name` is a plain public def here.
+  def test_def_self_and_initialize_are_not_counted_as_public_defs
     type_counts, item_counts, = SA.counts(sample)
-    assert_equal 3, item_counts[:public_instance_method_def]
-    assert_equal 3, type_counts[:public_methods]
+    assert_equal 1, item_counts[:public_instance_method_def]
+    assert_equal 1, type_counts[:public_methods]
     assert_equal 1, item_counts[:public_class_method_def]
     assert_equal 1, item_counts[:initializer_def]
   end

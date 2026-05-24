@@ -27,10 +27,11 @@ module Linecounter
       end
       if options[:show_structure_overview]
         payload[:structure_overview] = result.structure_overview
-        payload[:structure_item_loc_overview] = result.structure_item_loc_overview
+        payload[:structure_loc_overview] = type_loc_overview(result)
       end
       if options[:show_detailed_structure]
         payload[:structure_item_counts_overview] = result.structure_item_counts_overview
+        payload[:structure_item_loc_overview] = result.structure_item_loc_overview
       end
       unless options[:show_detailed_structure]
         payload[:top] = payload[:top].map { |r| r.reject { |k, _| k == :structure_item_loc || k == :structure_item_counts } }
@@ -65,7 +66,7 @@ module Linecounter
         puts "Structure overview (all scanned files):"
         StructureAnalyzer::STRUCTURE_ORDER.each do |key|
           count = result.structure_overview[key]
-          avg_loc_per_item = count.zero? ? 0.0 : (result.structure_item_loc_overview[key].to_f / count)
+          avg_loc_per_item = count.zero? ? 0.0 : (type_loc_sum(result, key).to_f / count)
           puts "%-26s count=%-4d avg_loc_per_item=%0.2f" % [key, count, avg_loc_per_item]
         end
       end
@@ -86,6 +87,21 @@ module Linecounter
           puts type
           lines.each { |line| puts line }
         end
+      end
+    end
+
+    # Total statement LOC for a structure type, summed from its items. The
+    # per-item LOC is item-keyed, so it must be rolled up by type here rather
+    # than indexed directly by the type symbol.
+    def type_loc_sum(result, type)
+      StructureAnalyzer::STRUCTURE_ITEMS
+        .select { |item| item[:type] == type }
+        .sum { |item| result.structure_item_loc_overview[item[:key]] }
+    end
+
+    def type_loc_overview(result)
+      result.structure_overview.keys.each_with_object({}) do |type, acc|
+        acc[type] = type_loc_sum(result, type)
       end
     end
   end
