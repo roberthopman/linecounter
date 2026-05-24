@@ -1,8 +1,8 @@
 require_relative "test_helper"
 
-# Black-box golden master: runs q.rb against a frozen fixture repo and compares
-# stdout to a stored snapshot. Pins current behavior (including known bugs) so
-# the upcoming refactor is provably behavior-preserving. Regenerate snapshots
+# Black-box golden master: runs the linecounter executable against a frozen
+# fixture repo and compares stdout to a stored snapshot. Exercises the actual
+# shipped binary (exe/linecounter via -Ilib). Regenerate snapshots
 # intentionally with: UPDATE_GOLDEN=1 rake test
 class CLIGoldenTest < Minitest::Test
   CASES = {
@@ -29,14 +29,14 @@ class CLIGoldenTest < Minitest::Test
   end
 
   def test_defaults_repo_to_current_directory
-    out, _err, status = Open3.capture3(RUBY, Q_RB, chdir: @repo)
+    out, _err, status = Open3.capture3(RUBY, "-I#{LIB}", EXE, chdir: @repo)
     assert status.success?, "expected success when --repo omitted inside a git repo"
     assert_equal File.read(File.join(GOLDEN_DIR, "default.txt")), normalize(out)
   end
 
   def test_aborts_when_current_directory_is_not_a_git_repo
     Dir.mktmpdir("linecounter-not-a-repo") do |dir|
-      _out, err, status = Open3.capture3(RUBY, Q_RB, chdir: dir)
+      _out, err, status = Open3.capture3(RUBY, "-I#{LIB}", EXE, chdir: dir)
       refute status.success?
       assert_includes err, "Not inside a git repository"
     end
@@ -59,7 +59,7 @@ class CLIGoldenTest < Minitest::Test
   end
 
   def run_cli(args)
-    out, _err, _status = Open3.capture3(RUBY, Q_RB, *args)
+    out, _err, _status = Open3.capture3(RUBY, "-I#{LIB}", EXE, *args)
     out
   end
 

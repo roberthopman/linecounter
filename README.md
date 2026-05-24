@@ -20,8 +20,6 @@ From a checkout you can run it without installing:
 
 ```bash
 ruby -Ilib exe/linecounter --repo /path/to/repo
-# or the convenience shim at the repo root:
-ruby q.rb --repo /path/to/repo
 ```
 
 ## Usage
