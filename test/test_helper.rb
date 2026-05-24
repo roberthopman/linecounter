@@ -9,3 +9,5 @@ ROOT = File.expand_path("..", __dir__)
 Q_RB = File.join(ROOT, "q.rb")
 GOLDEN_DIR = File.join(__dir__, "golden")
 RUBY = RbConfig.ruby
+
+$LOAD_PATH.unshift File.join(ROOT, "lib")
