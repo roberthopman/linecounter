@@ -1,3 +1,4 @@
+require "bundler/gem_tasks"
 require "rake/testtask"
 
 Rake::TestTask.new(:test) do |t|
@@ -7,3 +8,7 @@ Rake::TestTask.new(:test) do |t|
 end
 
 task default: :test
+
+# Never cut a release that doesn't pass the suite: `rake release` (build, tag
+# v#{version}, push to RubyGems) runs the tests first and aborts on failure.
+Rake::Task["release"].enhance(["test"])
