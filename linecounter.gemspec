@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.email = ["hopman.r@gmail.com"]
 
   spec.summary = "Per-file Ruby quality signals: lines of code, churn, branching, and structure."
-  spec.description = "linecounter scans a git repository and reports per-file quality signals — " \
+  spec.description = "linecounter scans a git repository and reports per-file quality signals: " \
                      "non-empty lines of code, git churn, control-flow branching, and class-structure " \
                      "counts with average statement lines per item. Output as text or JSON."
   spec.homepage = "https://github.com/roberthopman/linecounter"
