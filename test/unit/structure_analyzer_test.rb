@@ -44,6 +44,99 @@ class StructureAnalyzerTest < Minitest::Test
     assert_equal 1, item_counts[:initializer_def]
   end
 
+  # Bug A: a `private` in one class must not leak into the next class.
+  def test_visibility_does_not_leak_across_classes
+    type_counts, = SA.counts(<<~RUBY)
+      class A
+        private
+        def a; end
+      end
+      class B
+        def b; end
+        def c; end
+      end
+    RUBY
+    assert_equal 2, type_counts[:public_methods]
+    assert_equal 1, type_counts[:private_methods]
+  end
+
+  # Bug B: `private def foo` counts foo as private but does not switch the
+  # surrounding section to private for following methods.
+  def test_inline_private_def_counts_without_flipping_section
+    type_counts, item_counts, = SA.counts(<<~RUBY)
+      class A
+        def pub1; end
+        private def helper; end
+        def pub2; end
+      end
+    RUBY
+    assert_equal 2, type_counts[:public_methods]
+    assert_equal 1, type_counts[:private_methods]
+    assert_equal 1, item_counts[:private_instance_method_def]
+  end
+
+  def test_inline_private_attr_reader_is_counted_at_that_visibility
+    _type_counts, item_counts, = SA.counts(<<~RUBY)
+      class A
+        private attr_reader :secret
+        def pub; end
+      end
+    RUBY
+    assert_equal 1, item_counts[:private_attr_reader]
+    assert_equal 1, item_counts[:public_instance_method_def]
+  end
+
+  # Nested class opens a fresh public scope and, on its end, restores the
+  # enclosing class's section visibility.
+  def test_nested_scope_resets_and_restores_visibility
+    type_counts, = SA.counts(<<~RUBY)
+      class Outer
+        private
+        def o1; end
+        class Inner
+          def i; end
+        end
+        def o2; end
+      end
+    RUBY
+    assert_equal 1, type_counts[:public_methods]   # Inner#i
+    assert_equal 2, type_counts[:private_methods]  # Outer#o1, Outer#o2
+  end
+
+  # Regression: do/end and control-flow blocks inside a method must not throw
+  # off the scope stack and leak visibility.
+  def test_blocks_inside_methods_do_not_break_scope
+    type_counts, = SA.counts(<<~RUBY)
+      class A
+        def total
+          [1].each do |x|
+            next if x.nil?
+          end
+        end
+        private
+        def helper
+          case 1
+          when 1 then :a
+          end
+        end
+      end
+      class B
+        def pub; end
+      end
+    RUBY
+    assert_equal 2, type_counts[:public_methods]   # A#total, B#pub
+    assert_equal 1, type_counts[:private_methods]  # A#helper
+  end
+
+  # Bug C: a comparison at line start is not a constant assignment.
+  def test_comparison_at_line_start_is_not_a_constant
+    _type_counts, item_counts, = SA.counts(<<~RUBY)
+      STATUS == :active
+      MAX = 10
+    RUBY
+    assert_equal 1, item_counts[:constant_assignment]
+  end
+
   private
 
   def sample

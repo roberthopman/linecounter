@@ -17,14 +17,19 @@ module Linecounter
       :private_methods
     ].freeze
 
-    CONSTANT_RE = /^\s*[A-Z][A-Z0-9_]*\s*=/
+    CONSTANT_RE = /^\s*[A-Z][A-Z0-9_]*\s*=(?![=~>])/
     DEF_SELF_RE = /^\s*def\s+self\./
     DEF_RE = /^\s*def\s+([a-zA-Z_]\w*)\b/
     INITIALIZE_RE = /^\s*def\s+initialize\b/
     CLASS_SELF_RE = /^\s*class\s+<<\s*self\b/
     VISIBILITY_RE = /^\s*(public|protected|private)\b/
     END_RE = /^\s*end\b/
-    BLOCK_OPEN_RE = /^\s*(class|module|def|if|unless|case|while|until|begin|for)\b/
+    SCOPE_OPEN_RE = /^\s*(class|module)\b/
+    CONTROL_OPEN_RE = /^\s*(if|unless|case|while|until|begin|for)\b/
+    DO_BLOCK_RE = /\bdo\b(\s*\|[^|]*\|)?\s*\z/
+    INLINE_END_RE = /\bend\b\s*\z/
+    ENDLESS_DEF_RE = /^\s*def\b.*\)\s*=(?!=)/
+    ENDLESS_DEF_NOPAREN_RE = /^\s*def\s+[^\s(]+\s+=(?!=)/
 
     STRUCTURE_ITEMS = [
       { key: :include, type: :module_inclusion, label: "include", match: ->(s, _v) { s.match?(/\binclude\b/) } },
@@ -79,6 +84,46 @@ module Linecounter
       str.match?(DEF_RE) && !str.match?(DEF_SELF_RE) && !str.match?(INITIALIZE_RE)
     end
 
+    # Endless method (`def foo = expr`, `def foo(x) = expr`) has no `end`, so it
+    # must not be treated as opening a block. A setter (`def foo=(v)`) does.
+    def endless_def?(str)
+      str.match?(ENDLESS_DEF_RE) || str.match?(ENDLESS_DEF_NOPAREN_RE)
+    end
+
+    def opens_block?(str)
+      return false if endless_def?(str)
+
+      str.match?(/^\s*def\b/) || str.match?(CONTROL_OPEN_RE) || str.match?(DO_BLOCK_RE)
+    end
+
+    # True when a line opens and closes its block on the same line, e.g.
+    # `def foo; end` or `[1].each { ... }`-style `... do ... end`.
+    def one_liner_closed?(str)
+      str.match?(INLINE_END_RE) && !str.match?(END_RE)
+    end
+
+    # Maintains the visibility-scope stack as we walk the file. Each open
+    # class/module/singleton pushes a frame whose visibility starts public;
+    # its `end` pops it, restoring the enclosing scope's visibility. Method
+    # and control-flow blocks are tracked only so their `end`s don't pop a
+    # scope frame by mistake.
+    def update_nesting(str, scopes, block_stack)
+      if str.match?(CLASS_SELF_RE)
+        block_stack.push(:scope)
+        scopes.push(:public)
+      elsif str.match?(SCOPE_OPEN_RE)
+        return if one_liner_closed?(str)
+
+        block_stack.push(:scope)
+        scopes.push(:public)
+      elsif str.match?(END_RE)
+        frame = block_stack.pop
+        scopes.pop if frame == :scope && scopes.size > 1
+      elsif opens_block?(str) && !one_liner_closed?(str)
+        block_stack.push(:other)
+      end
+    end
+
     def statement_span(lines, start_idx)
       paren_balance = 0
       i = start_idx
@@ -97,21 +142,32 @@ module Linecounter
       type_counts = Hash.new(0)
       item_counts = Hash.new(0)
       item_loc_sums = Hash.new(0)
-      visibility = :public
-      stack = []
+      scopes = [:public]
+      block_stack = []
       lines = content.each_line.to_a
 
       lines.each_with_index do |line, idx|
         strip = line.strip
         next if strip.empty? || strip.start_with?("#")
 
+        effective = strip
+        line_visibility = scopes.last
+
         if (m = strip.match(VISIBILITY_RE))
-          visibility = m[1].to_sym
-          next
+          rest = strip[m[0].length..].to_s.strip
+          if rest.empty?
+            # Bare `private` / `protected` / `public` sets the section.
+            scopes[-1] = m[1].to_sym
+            next
+          end
+          # Inline modifier (`private def foo`): apply to this line only,
+          # without changing the surrounding section's visibility.
+          line_visibility = m[1].to_sym
+          effective = rest
         end
 
         STRUCTURE_ITEMS.each do |item|
-          next unless item[:match].call(strip, visibility)
+          next unless item[:match].call(effective, line_visibility)
 
           span = statement_span(lines, idx)
           item_counts[item[:key]] += 1
@@ -119,17 +175,7 @@ module Linecounter
           type_counts[item[:type]] += 1
         end
 
-        if strip.match?(CLASS_SELF_RE)
-          stack << :singleton
-          next
-        end
-
-        if strip.match?(END_RE)
-          stack.pop
-          next
-        end
-
-        stack << :block if strip.match?(BLOCK_OPEN_RE)
+        update_nesting(effective, scopes, block_stack)
       end
 
       [type_counts, item_counts, item_loc_sums]
