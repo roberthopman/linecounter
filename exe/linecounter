@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+# linecounter
+# Lists Ruby files with lines of code, churn, branching, and avg loc per item.
+
+require "linecounter"
+
+Linecounter::CLI.run(ARGV)

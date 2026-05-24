@@ -1,3 +1,4 @@
+require_relative "linecounter/version"
 require_relative "linecounter/branch_analyzer"
 require_relative "linecounter/structure_analyzer"
 require_relative "linecounter/git"

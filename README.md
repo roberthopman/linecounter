@@ -1,11 +1,33 @@
-# q.rb
+# linecounter
 
-`q.rb` lists Ruby files with lines of code, churn, branching, and avg loc per item.
+`linecounter` lists Ruby files with lines of code, churn, branching, and avg loc per item.
+
+## Installation
+
+Install the gem:
+
+```bash
+gem install linecounter
+```
+
+Or add it to a Gemfile:
+
+```ruby
+gem "linecounter"
+```
+
+From a checkout you can run it without installing:
+
+```bash
+ruby -Ilib exe/linecounter --repo /path/to/repo
+# or the convenience shim at the repo root:
+ruby q.rb --repo /path/to/repo
+```
 
 ## Usage
 
 ```bash
-ruby q.rb [options]
+linecounter [options]
 ```
 
 ## Options
@@ -26,22 +48,22 @@ ruby q.rb [options]
 `--repo` is required. If omitted, the script prints only the `--repo` requirement line and exits.
 
 ```bash
-ruby q.rb --repo /path/to/repo
-ruby q.rb --repo /path/to/repo --top 50
-ruby q.rb --repo /path/to/repo --since 2025-01-01
-ruby q.rb --repo /path/to/repo --since 2.weeks.ago
-ruby q.rb --repo /path/to/repo --min-loc 50
-ruby q.rb --repo /path/to/repo --show-branch-count
-ruby q.rb --repo /path/to/repo --show-structure-overview
-ruby q.rb --repo /path/to/repo --detailed-structure
-ruby q.rb --repo /path/to/repo --json
-ruby q.rb --repo /path/to/repo --top 30 --since 3.months.ago --show-structure-overview
+linecounter --repo /path/to/repo
+linecounter --repo /path/to/repo --top 50
+linecounter --repo /path/to/repo --since 2025-01-01
+linecounter --repo /path/to/repo --since 2.weeks.ago
+linecounter --repo /path/to/repo --min-loc 50
+linecounter --repo /path/to/repo --show-branch-count
+linecounter --repo /path/to/repo --show-structure-overview
+linecounter --repo /path/to/repo --detailed-structure
+linecounter --repo /path/to/repo --json
+linecounter --repo /path/to/repo --top 30 --since 3.months.ago --show-structure-overview
 ```
 
 ## Example Output
 
 ```bash
-$ ruby q.rb --min-loc 700 --detailed-structure --since 2.months.ago --repo ../hello-world
+$ linecounter --min-loc 700 --detailed-structure --since 2.months.ago --repo ../hello-world
 Ruby Quality Signals
 Files scanned: 3
 

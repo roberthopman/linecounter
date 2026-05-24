@@ -38,7 +38,7 @@ module Linecounter
 
     def build_parser(options)
       OptionParser.new do |o|
-        o.banner = "Usage: ruby q.rb [options]"
+        o.banner = "Usage: linecounter [options]"
         o.separator ""
         o.separator "Options:"
         o.on("--top N", Integer, "Show top N rows (default: 20).") { |v| options[:top] = v }
@@ -53,16 +53,16 @@ module Linecounter
         o.on("-h", "--help", "Show this help.") { puts o; exit }
         o.separator ""
         o.separator "Examples:"
-        o.separator "  ruby q.rb"
-        o.separator "  ruby q.rb --top 50"
-        o.separator "  ruby q.rb --since 2025-01-01"
-        o.separator "  ruby q.rb --since 2.weeks.ago"
-        o.separator "  ruby q.rb --min-loc 50"
-        o.separator "  ruby q.rb --show-branch-count"
-        o.separator "  ruby q.rb --show-structure-overview"
-        o.separator "  ruby q.rb --detailed-structure"
-        o.separator "  ruby q.rb --json"
-        o.separator "  ruby q.rb --repo /path/to/repo --top 30 --since 3.months.ago"
+        o.separator "  linecounter --repo /path/to/repo"
+        o.separator "  linecounter --repo /path/to/repo --top 50"
+        o.separator "  linecounter --repo /path/to/repo --since 2025-01-01"
+        o.separator "  linecounter --repo /path/to/repo --since 2.weeks.ago"
+        o.separator "  linecounter --repo /path/to/repo --min-loc 50"
+        o.separator "  linecounter --repo /path/to/repo --show-branch-count"
+        o.separator "  linecounter --repo /path/to/repo --show-structure-overview"
+        o.separator "  linecounter --repo /path/to/repo --detailed-structure"
+        o.separator "  linecounter --repo /path/to/repo --json"
+        o.separator "  linecounter --repo /path/to/repo --top 30 --since 3.months.ago"
       end
     end
   end
