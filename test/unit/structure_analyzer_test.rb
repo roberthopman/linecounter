@@ -4,18 +4,31 @@ require "linecounter"
 class StructureAnalyzerTest < Minitest::Test
   SA = Linecounter::StructureAnalyzer
 
-  def test_statement_span_single_line
-    assert_equal 1, SA.statement_span(["def foo\n", "end\n"], 0)
+  def test_loc_span_reflects_method_length
+    _tc, _ic, loc = SA.counts(<<~RUBY)
+      class A
+        def big
+          a = 1
+          b = 2
+          a + b
+        end
+      end
+    RUBY
+    assert_equal 5, loc[:public_instance_method_def]
   end
 
-  def test_statement_span_trailing_comma_continuation
-    lines = ["validates :name,\n", "  presence: true\n", "end\n"]
-    assert_equal 2, SA.statement_span(lines, 0)
-  end
-
-  def test_statement_span_paren_continuation
-    lines = ["foo(\n", "  a,\n", "  b)\n", "end\n"]
-    assert_equal 3, SA.statement_span(lines, 0)
+  def test_macros_inside_method_bodies_are_not_counted
+    _tc, item_counts, = SA.counts(<<~RUBY)
+      class A
+        has_many :real
+        def build
+          has_many :fake
+          scope :nope
+        end
+      end
+    RUBY
+    assert_equal 1, item_counts[:has_many]
+    assert_equal 0, item_counts[:scope]
   end
 
   def test_counts_classifies_by_type_and_visibility

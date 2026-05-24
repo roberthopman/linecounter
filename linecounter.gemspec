@@ -22,6 +22,8 @@ Gem::Specification.new do |spec|
   spec.executables = ["linecounter"]
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "prism", ">= 0.19"
+
   spec.add_development_dependency "minitest", "~> 5.0"
   spec.add_development_dependency "rake", "~> 13.0"
 end

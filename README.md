@@ -65,10 +65,15 @@ linecounter --repo /path/to/repo --top 30 --since 3.months.ago --show-structure-
 
 ## Example Output
 
+Signals are computed from the parsed AST (via [Prism](https://github.com/ruby/prism)),
+so keywords in strings or comments are never miscounted and `avg_loc_per_item`
+reflects real definition length. Churn varies with git history, so your numbers
+will differ:
+
 ```bash
-$ linecounter --min-loc 700 --detailed-structure --since 2.months.ago --repo ../hello-world
+$ linecounter --repo . --min-loc 80 --detailed-structure
 Ruby Quality Signals
-Files scanned: 3
+Files scanned: 4
 
 Column descriptions:
   Churn    = total git commits touching the file (optionally since --since).
@@ -77,31 +82,20 @@ Column descriptions:
   File     = repository-relative path.
 
 Churn  Branches LOC    File
-13     253      805    app/models/document.rb
-7      66       1193   app/services/pdf_generator.rb
-1      146      744    app/services/company_generator.rb
+3      34       189    lib/linecounter/structure_analyzer.rb
+3      0        161    test/unit/structure_analyzer_test.rb
+2      13       99     lib/linecounter/report.rb
+1      3        99     lib/linecounter/branch_analyzer.rb
 
 Detailed structure (all scanned files):
-module_inclusion
-  include                    count=9    avg_loc_per_item=12.11
-association
-  has_many                   count=7    avg_loc_per_item=2.14
-  has_one                    count=2    avg_loc_per_item=2.00
-  belongs_to                 count=7    avg_loc_per_item=1.00
+constants
+  CONSTANT =                 count=11   avg_loc_per_item=8.27
 public_attribute_macros
-  public attr_reader         count=1    avg_loc_per_item=1.00
-macros
-  scope                      count=10   avg_loc_per_item=20.60
-  validates                  count=1    avg_loc_per_item=4.00
-  validate                   count=1    avg_loc_per_item=1.00
-  after_*                    count=1    avg_loc_per_item=1.00
-  enum                       count=2    avg_loc_per_item=4.00
-public_class_methods
-  public class def           count=2    avg_loc_per_item=1.00
+  public attr_reader         count=2    avg_loc_per_item=1.00
 initializer
-  initialize                 count=2    avg_loc_per_item=1.00
+  initialize                 count=2    avg_loc_per_item=7.00
 public_methods
-  public def                 count=68   avg_loc_per_item=1.12
+  public def                 count=38   avg_loc_per_item=8.53
 private_methods
-  private def                count=69   avg_loc_per_item=1.00
+  private def                count=8    avg_loc_per_item=9.75
 ```

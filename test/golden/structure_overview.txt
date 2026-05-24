@@ -8,8 +8,8 @@ Column descriptions:
   File     = repository-relative path.
 
 Churn  Branches LOC    File
-3      7        42     app/models/widget.rb
-2      12       29     app/services/calc.rb
+3      5        42     app/models/widget.rb
+2      9        29     app/services/calc.rb
 
 Structure overview (all scanned files):
 module_inclusion           count=2    avg_loc_per_item=1.00
@@ -18,11 +18,11 @@ association                count=3    avg_loc_per_item=1.00
 public_attribute_macros    count=1    avg_loc_per_item=1.00
 public_delegate            count=0    avg_loc_per_item=0.00
 macros                     count=5    avg_loc_per_item=1.00
-public_class_methods       count=1    avg_loc_per_item=1.00
-initializer                count=2    avg_loc_per_item=1.00
-public_methods             count=4    avg_loc_per_item=1.00
+public_class_methods       count=1    avg_loc_per_item=3.00
+initializer                count=2    avg_loc_per_item=3.50
+public_methods             count=4    avg_loc_per_item=7.00
 protected_attribute_macros count=0    avg_loc_per_item=0.00
 protected_methods          count=0    avg_loc_per_item=0.00
 private_attribute_macros   count=0    avg_loc_per_item=0.00
 private_delegate           count=0    avg_loc_per_item=0.00
-private_methods            count=3    avg_loc_per_item=1.00
+private_methods            count=3    avg_loc_per_item=4.33

@@ -8,5 +8,5 @@ Column descriptions:
   File     = repository-relative path.
 
 Churn  Branches LOC    File
-1      12       29     app/services/calc.rb
-0      7        42     app/models/widget.rb
+1      9        29     app/services/calc.rb
+0      5        42     app/models/widget.rb
