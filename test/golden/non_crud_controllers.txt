@@ -1,0 +1,19 @@
+Ruby Quality Signals
+Files scanned: 3
+
+Column descriptions:
+  Churn    = total git commits touching the file (optionally since --since).
+  Branches = count of control-flow tokens (sum of per-keyword counts).
+  LOC      = non-empty lines of code in the file.
+  File     = repository-relative path.
+
+Churn  Branches LOC    File
+0      0        7      app/controllers/posts_controller.rb
+0      0        4      app/controllers/comments_controller.rb
+0      0        3      app/models/post.rb
+
+Non-CRUD controllers:
+Controllers scanned: 2
+Non-CRUD: 1
+
+  app/controllers/comments_controller.rb  archive

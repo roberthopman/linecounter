@@ -36,6 +36,17 @@ module Linecounter
       unless options[:show_detailed_structure]
         payload[:top] = payload[:top].map { |r| r.reject { |k, _| k == :structure_item_loc || k == :structure_item_counts } }
       end
+      payload[:top] = payload[:top].map { |r| r.reject { |k, _| k == :crud_profile } }
+      if options[:crud_only_controllers]
+        payload[:crud_only_controllers] = crud_only_controllers(rows).map do |r|
+          { file: r[:file], actions: r[:crud_profile][:actions] }
+        end
+      end
+      if options[:non_crud_controllers]
+        payload[:non_crud_controllers] = non_crud_controllers(rows).map do |r|
+          { file: r[:file], actions: r[:crud_profile][:actions], extra_actions: r[:crud_profile][:extra_actions] }
+        end
+      end
       puts JSON.pretty_generate(payload)
     end
 
@@ -88,6 +99,48 @@ module Linecounter
           lines.each { |line| puts line }
         end
       end
+
+      if options[:crud_only_controllers]
+        controllers = rows.select { |r| r[:crud_profile] }
+        crud_only = crud_only_controllers(rows)
+        puts
+        puts "CRUD-only controllers:"
+        puts "Controllers scanned: #{controllers.size}"
+        puts "CRUD-only: #{crud_only.size}"
+        puts
+        crud_only.each do |r|
+          puts "  %s  %s" % [r[:file], r[:crud_profile][:actions].join(", ")]
+        end
+      end
+
+      if options[:non_crud_controllers]
+        controllers = rows.select { |r| r[:crud_profile] }
+        non_crud = non_crud_controllers(rows)
+        puts
+        puts "Non-CRUD controllers:"
+        puts "Controllers scanned: #{controllers.size}"
+        puts "Non-CRUD: #{non_crud.size}"
+        puts
+        non_crud.each do |r|
+          puts "  %s  %s" % [r[:file], r[:crud_profile][:extra_actions].join(", ")]
+        end
+      end
+    end
+
+    # Rows for controllers whose public actions are all standard RESTful
+    # actions, sorted by path for stable output.
+    def crud_only_controllers(rows)
+      rows
+        .select { |r| r[:crud_profile]&.fetch(:crud_only) }
+        .sort_by { |r| r[:file] }
+    end
+
+    # Rows for controllers that expose at least one custom (non-RESTful) public
+    # action, sorted by path for stable output.
+    def non_crud_controllers(rows)
+      rows
+        .select { |r| r[:crud_profile] && !r[:crud_profile][:crud_only] }
+        .sort_by { |r| r[:file] }
     end
 
     # Total statement LOC for a structure type, summed from its items. The

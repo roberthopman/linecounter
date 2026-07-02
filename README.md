@@ -39,6 +39,9 @@ linecounter [options]
 - `--show-structure-overview` Show a summary of class structure counts across all files, including `avg_loc_per_item` (avg statement lines per item).
 - `--show-interaction-overview` Alias for `--show-structure-overview`.
 - `--detailed-structure` Show overall structure averages (avg lines per item) for each regex item across all files.
+- `--crud-only-controllers` List Rails controllers (files matching `app/controllers/**/*_controller.rb`) whose public actions are all standard RESTful actions (`index`, `show`, `new`, `create`, `edit`, `update`, `destroy`). Private and protected methods are ignored; a single non-CRUD public action excludes the controller.
+- `--non-crud-controllers` The inverse: list controllers that expose at least one custom (non-RESTful) public action, showing those extra actions. Useful for spotting controllers that have grown beyond plain resourceful routing.
+- `--no-churn` Skip git churn computation. Churn runs one `git log` per file, so on large repos it dominates runtime; skipping it makes runs near-instant at the cost of a `0` Churn column. Useful with `--crud-only-controllers`, which does not need churn.
 - `-h`, `--help` Show help.
 
 ## Examples
@@ -57,6 +60,8 @@ linecounter --repo /path/to/repo --min-loc 50
 linecounter --repo /path/to/repo --show-branch-count
 linecounter --repo /path/to/repo --show-structure-overview
 linecounter --repo /path/to/repo --detailed-structure
+linecounter --repo /path/to/repo --crud-only-controllers
+linecounter --repo /path/to/repo --non-crud-controllers --no-churn
 linecounter --repo /path/to/repo --json
 linecounter --repo /path/to/repo --top 30 --since 3.months.ago --show-structure-overview
 ```

@@ -13,6 +13,9 @@ module Linecounter
       show_branch_count: false,
       show_structure_overview: false,
       show_detailed_structure: false,
+      crud_only_controllers: false,
+      non_crud_controllers: false,
+      no_churn: false,
       repo: nil
     }.freeze
 
@@ -28,7 +31,7 @@ module Linecounter
       repo_path = File.expand_path(options[:repo])
       abort "Not inside a git repository: #{repo_path}" unless Git.repo?(repo_path)
 
-      result = Analyzer.run(repo_path: repo_path, min_loc: options[:min_loc], since: options[:since])
+      result = Analyzer.run(repo_path: repo_path, min_loc: options[:min_loc], since: options[:since], churn: !options[:no_churn])
       Report.render(result, options)
     end
 
@@ -46,6 +49,9 @@ module Linecounter
         o.on("--show-structure-overview", "Show a summary of class structure counts across all files, including avg_loc_per_item (avg statement lines per item).") { options[:show_structure_overview] = true }
         o.on("--show-interaction-overview", "Alias for --show-structure-overview.") { options[:show_structure_overview] = true }
         o.on("--detailed-structure", "Show overall structure averages (avg lines per item) for each regex item across all files.") { options[:show_detailed_structure] = true }
+        o.on("--crud-only-controllers", "List Rails controllers whose public actions are all standard RESTful actions (index/show/new/create/edit/update/destroy).") { options[:crud_only_controllers] = true }
+        o.on("--non-crud-controllers", "List Rails controllers that expose custom (non-RESTful) public actions, showing those extra actions.") { options[:non_crud_controllers] = true }
+        o.on("--no-churn", "Skip git churn computation (much faster on large repos; the Churn column reports 0).") { options[:no_churn] = true }
         o.on("-h", "--help", "Show this help.") { puts o; exit }
         o.separator ""
         o.separator "Examples:"
@@ -58,6 +64,8 @@ module Linecounter
         o.separator "  linecounter --repo /path/to/repo --show-branch-count"
         o.separator "  linecounter --repo /path/to/repo --show-structure-overview"
         o.separator "  linecounter --repo /path/to/repo --detailed-structure"
+        o.separator "  linecounter --repo /path/to/repo --crud-only-controllers"
+        o.separator "  linecounter --repo /path/to/repo --non-crud-controllers"
         o.separator "  linecounter --repo /path/to/repo --json"
         o.separator "  linecounter --repo /path/to/repo --top 30 --since 3.months.ago"
       end

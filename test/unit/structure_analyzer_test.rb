@@ -150,6 +150,82 @@ class StructureAnalyzerTest < Minitest::Test
     assert_equal 1, item_counts[:constant_assignment]
   end
 
+  def test_crud_profile_flags_controller_with_only_standard_actions
+    profile = SA.crud_profile(<<~RUBY)
+      class PostsController < ApplicationController
+        def index; end
+        def show; end
+        def create; end
+
+        private
+
+        def post_params; end
+      end
+    RUBY
+    assert profile[:crud_only]
+    assert_equal %i[index show create], profile[:actions]
+    assert_empty profile[:extra_actions]
+  end
+
+  def test_crud_profile_reports_extra_public_actions
+    profile = SA.crud_profile(<<~RUBY)
+      class PostsController < ApplicationController
+        def index; end
+        def archive; end
+      end
+    RUBY
+    refute profile[:crud_only]
+    assert_equal %i[index], profile[:actions]
+    assert_equal %i[archive], profile[:extra_actions]
+  end
+
+  def test_crud_profile_ignores_private_and_protected_methods
+    profile = SA.crud_profile(<<~RUBY)
+      class PostsController < ApplicationController
+        def index; end
+
+        protected
+
+        def authorize!; end
+
+        private
+
+        def set_post; end
+      end
+    RUBY
+    assert profile[:crud_only]
+    assert_equal %i[index], profile[:actions]
+  end
+
+  def test_crud_profile_matches_namespaced_controllers
+    profile = SA.crud_profile(<<~RUBY)
+      module Admin
+        class PostsController < ApplicationController
+          def index; end
+        end
+      end
+    RUBY
+    assert profile[:crud_only]
+  end
+
+  def test_crud_profile_returns_nil_for_non_controller_class
+    assert_nil SA.crud_profile(<<~RUBY)
+      class Post
+        def index; end
+      end
+    RUBY
+  end
+
+  def test_crud_profile_returns_nil_for_controller_without_actions
+    assert_nil SA.crud_profile(<<~RUBY)
+      class ApplicationController < ActionController::Base
+        private
+
+        def current_user; end
+      end
+    RUBY
+  end
+
   private
 
   def sample
