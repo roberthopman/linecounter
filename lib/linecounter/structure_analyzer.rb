@@ -82,13 +82,16 @@ module Linecounter
     # macro, and constant is attributed accurately at the structure level only
     # (declarations inside method bodies are not miscounted).
     class StructureVisitor < Prism::Visitor
-      attr_reader :type_counts, :item_counts, :item_loc_sums
+      attr_reader :type_counts, :item_counts, :item_loc_sums,
+                  :public_instance_method_names, :class_names
 
       def initialize
         super
         @type_counts = Hash.new(0)
         @item_counts = Hash.new(0)
         @item_loc_sums = Hash.new(0)
+        @public_instance_method_names = []
+        @class_names = []
         @visibility = [:public]
         @method_depth = 0
         @singleton_depth = 0
@@ -96,6 +99,7 @@ module Linecounter
       end
 
       def visit_class_node(node)
+        @class_names << node.constant_path.slice
         with_scope { super }
       end
 
@@ -177,7 +181,9 @@ module Linecounter
         elsif node.name == :initialize
           record(:initializer_def, node)
         else
-          record(VISIBILITY_DEF_KEYS.fetch(current_visibility), node)
+          key = VISIBILITY_DEF_KEYS.fetch(current_visibility)
+          @public_instance_method_names << node.name if key == :public_instance_method_def
+          record(key, node)
         end
       end
 
@@ -212,12 +218,35 @@ module Linecounter
       end
     end
 
+    # The seven standard Rails RESTful actions.
+    CRUD_ACTIONS = %i[index show new create edit update destroy].freeze
+
     module_function
 
     def counts(content)
       visitor = StructureVisitor.new
       Prism.parse(content).value.accept(visitor)
       [visitor.type_counts, visitor.item_counts, visitor.item_loc_sums]
+    end
+
+    # Classifies a Ruby source as a Rails controller by CRUD coverage. Returns
+    # nil unless the source defines a class named *Controller with at least one
+    # public action; otherwise a hash describing how its public actions relate
+    # to the standard RESTful set.
+    def crud_profile(content)
+      visitor = StructureVisitor.new
+      Prism.parse(content).value.accept(visitor)
+      return nil unless visitor.class_names.any? { |name| name.end_with?("Controller") }
+
+      actions = visitor.public_instance_method_names
+      return nil if actions.empty?
+
+      extra = actions - CRUD_ACTIONS
+      {
+        actions: actions & CRUD_ACTIONS,
+        extra_actions: extra,
+        crud_only: extra.empty?
+      }
     end
   end
 end
